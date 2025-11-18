@@ -9,6 +9,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SmartScreener.CLI", "SmartS
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SmartScreener.Tests", "SmartScreener.Tests\SmartScreener.Tests.fsproj", "{DE54FF45-C619-4390-86CA-8204B583D9B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartScreener.UI", "SmartScreener.UI\SmartScreener.UI.csproj", "{3F298F44-BC0E-4499-86D3-4F57BB1086C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{59841D3B-798F-4885-81D5-7C91C264B0A1} = {59841D3B-798F-4885-81D5-7C91C264B0A1}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,8 +60,23 @@ Global
 		{DE54FF45-C619-4390-86CA-8204B583D9B5}.Release|x64.Build.0 = Release|Any CPU
 		{DE54FF45-C619-4390-86CA-8204B583D9B5}.Release|x86.ActiveCfg = Release|Any CPU
 		{DE54FF45-C619-4390-86CA-8204B583D9B5}.Release|x86.Build.0 = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|x64.Build.0 = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Debug|x86.Build.0 = Debug|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|x64.ActiveCfg = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|x64.Build.0 = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|x86.ActiveCfg = Release|Any CPU
+		{3F298F44-BC0E-4499-86D3-4F57BB1086C0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5B860BE-B330-47C7-A06B-22A679D21B47}
 	EndGlobalSection
 EndGlobal

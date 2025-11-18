@@ -1,4 +1,5 @@
 ﻿open System
+open System.IO
 open System.Text
 open SmartScreener.Core
 open SmartScreener.Core.Extract
@@ -11,11 +12,20 @@ let readNonEmpty (prompt:string) =
         if String.IsNullOrWhiteSpace s then loop() else s
     loop()
 
+
+let rec readExistingFile prompt =
+    let path = readNonEmpty prompt
+    if File.Exists path then path
+    else
+        printfn "File not found: %s\nPlease try again." path
+        readExistingFile prompt
+
+
 [<EntryPoint>]
 let main _ =
     Console.OutputEncoding <- Encoding.UTF8
     printfn "\n=== Smart Resume Screener (CLI) ===\n"
-    let resumePath = readNonEmpty "Enter path to resume (.pdf or .txt): "
+    let resumePath = readExistingFile "Enter path to resume (.pdf or .txt): "
     let jdTitle    = readNonEmpty "Job Title: "
 
     printfn "Paste Job Description below (finish with a single line containing only 'END'):\n"
