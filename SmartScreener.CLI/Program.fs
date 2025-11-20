@@ -7,7 +7,7 @@ open SmartScreener.Core.MatchEngine
 
 let readNonEmpty (prompt:string) =
     let rec loop () =
-        printf "%s" prompt   // avoids Console.Write overload ambiguity
+        printf "%s" prompt   
         let s = Console.ReadLine()
         if String.IsNullOrWhiteSpace s then loop() else s
     loop()

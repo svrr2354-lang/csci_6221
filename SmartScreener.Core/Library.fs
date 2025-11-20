@@ -5,7 +5,6 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-// -------- Domain --------
 
 [<CLIMutable>]
 type Resume = { Path: string; Text: string }
@@ -23,11 +22,19 @@ type MatchResult = {
     ResumePreview: string
 }
 
-// -------- Normalization & Tokenization --------
 
 module Normalize =
+    open System
+
     let private rxSpace = Regex(@"\s+", RegexOptions.Compiled)
     let private rxNonAlnum = Regex(@"[^a-z0-9]+", RegexOptions.Compiled)
+
+    let private stopwords =
+        set [
+            "a"; "an"; "the"; "and"; "or"; "of"; "to"; "in"; "on"; "for"; "by"; "with"
+            "at"; "from"; "as"; "is"; "are"; "was"; "were"; "be"; "this"; "that"
+            "we"; "you"; "our"; "their"; "it"; "they"; "i"
+        ]
 
     let clean (s:string) =
         s.ToLowerInvariant()
@@ -36,7 +43,16 @@ module Normalize =
         |> fun t -> t.Trim()
 
     let tokenize (s:string) =
-        clean s |> fun t -> if String.IsNullOrWhiteSpace t then [||] else t.Split(' ')
+        let t = clean s
+        if String.IsNullOrWhiteSpace t then
+            [||]
+        else
+            t.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (fun w -> w.Trim())
+            |> Array.filter (fun w ->
+                w.Length > 2 &&               
+                not (stopwords.Contains w))   
+
 
 // -------- TF-IDF --------
 
@@ -48,7 +64,7 @@ module TfIdf =
         |> Array.map (fun (t,c) -> t, float c / float tokens.Length)
         |> Map.ofArray
 
-    /// naive idf over two docs (resume & JD); stable enough for baseline
+    
     let idf (docs:string[][]) =
         let n = float docs.Length
         docs
@@ -63,7 +79,7 @@ module TfIdf =
         )
         |> Map.ofArray
 
-    /// build a TF-IDF vector: term -> weight
+    
     let vector (tfMap:Map<string,float>) (idfMap:Map<string,float>) =
         tfMap
         |> Map.map (fun term tfv ->
@@ -74,9 +90,8 @@ module TfIdf =
             tfv * idf
         )
 
-    /// dot product between two sparse maps
+    
     let dot (a:Map<string,float>) (b:Map<string,float>) =
-        // iterate the smaller map for efficiency
         let smaller, bigger = if Map.count a < Map.count b then a,b else b,a
         smaller
         |> Seq.sumBy (fun (KeyValue(term, av)) ->
@@ -84,7 +99,7 @@ module TfIdf =
             av * bv
         )
 
-    /// Euclidean norm of a sparse vector
+    
     let norm (v:Map<string,float>) =
         v |> Seq.sumBy (fun (KeyValue(_, x)) -> x * x) |> sqrt
 
@@ -97,7 +112,7 @@ module TfIdf =
 // -------- Extractors --------
 
 module Extract =
-    open UglyToad.PdfPig   // <- requires the package reference and restore
+    open UglyToad.PdfPig   
 
     type ITextExtractor =
         abstract member CanHandle : string -> bool
@@ -134,7 +149,7 @@ module MatchEngine =
     type IScorer =
         abstract member Score : Resume * JobDescription -> MatchResult
 
-    /// Baseline TF-IDF cosine scorer + top overlapping terms for explanation
+    
     type TfidfScorer() =
         interface IScorer with
             member _.Score (resume, jd) =
@@ -146,7 +161,7 @@ module MatchEngine =
                 let rVec = TfIdf.vector rTf idf
                 let jVec = TfIdf.vector jTf idf
                 let score = TfIdf.cosine rVec jVec
-                // explanation: intersecting terms sorted by combined weight
+                
                 let overlap =
                     rVec
                     |> Seq.choose (fun (KeyValue(term, rv)) ->
@@ -154,7 +169,7 @@ module MatchEngine =
                         | Some jv -> Some { Term = term; ResumeTfIdf = rv; JdTfIdf = jv }
                         | None -> None)
                     |> Seq.sortByDescending (fun x -> x.ResumeTfIdf + x.JdTfIdf)
-                    |> Seq.truncate 15
+                    |> Seq.truncate 50
                     |> Seq.toList
                 let preview = resume.Text |> fun t -> if t.Length > 240 then t.Substring(0,240) + "…" else t
                 { Score = score; TopOverlap = overlap; ResumePreview = preview }
